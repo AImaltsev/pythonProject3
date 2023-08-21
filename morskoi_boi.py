@@ -51,10 +51,26 @@ class Board:
             for i in range(ship.size):
                 self.grid[y][x + i] = '■'
                 ship.coords.append((y, x + i))
+                if y > 0:
+                    self.grid[y - 1][x + i] = 'О'
+                if y < self.size - 1:
+                    self.grid[y + 1][x + i] = 'О'
+            if x > 0:
+                self.grid[y][x - 1] = 'О'  # Добавляем отступ слева от корабля
+            if x + ship.size < self.size:
+                self.grid[y][x + ship.size] = 'О'  # Добавляем отступ справа от корабля
         elif orientation == 'vertical':
             for i in range(ship.size):
                 self.grid[y + i][x] = '■'
                 ship.coords.append((y + i, x))
+                if x > 0:
+                    self.grid[y + i][x - 1] = 'О'
+                if x < self.size - 1:
+                    self.grid[y + i][x + 1] = 'О'
+            if y > 0:
+                self.grid[y - 1][x] = 'О'  # Добавляем отступ сверху от корабля
+            if y + ship.size < self.size:
+                self.grid[y + ship.size][x] = 'О'  # Добавляем отступ снизу от корабля
 
     def display(self, hide_ships=False):
         header = '   ' + ' | '.join(str(i + 1) for i in range(self.size))
@@ -90,8 +106,8 @@ def main():
                 raise Exception("Вы уже стреляли по этой ячейке.")
 
             player_moves.add(player_move)
-            x = ord(player_move[0]) - ord('A')
-            y = int(player_move[1]) - 1
+            x = int(player_move[1]) - 1  # Изменено: преобразование буквенной координаты в числовую
+            y = ord(player_move[0]) - ord('A')  # Изменено: преобразование буквенной координаты в числовую
 
             if computer_board.grid[y][x] == '■':
                 print("Вы подбили вражеский корабль!")
@@ -100,11 +116,11 @@ def main():
                         ship.hit()
                         if ship.is_sunk():
                             print("Вражеский корабль потоплен!")
-                        computer_board.grid[y][x] = 'X'  # Изменяем символ на X для отображения попадания
+                        computer_board.grid[y][x] = 'X'
 
             else:
                 print("Мимо!")
-                player_board.grid[y][x] = 'T'  # Изменяем символ на T для отображения промаха
+                player_board.grid[y][x] = 'T'
 
             computer_move = (random.randint(0, 5), random.randint(0, 5))
             if player_board.grid[computer_move[0]][computer_move[1]] == '■':
@@ -114,12 +130,10 @@ def main():
                         ship.hit()
                         if ship.is_sunk():
                             print("Ваш корабль потоплен!")
-                        player_board.grid[computer_move[0]][
-                            computer_move[1]] = 'X'  # Изменяем символ на X для отображения попадания
+                        player_board.grid[computer_move[0]][computer_move[1]] = 'X'
             else:
                 print("Компьютер промахнулся!")
-                player_board.grid[computer_move[0]][
-                    computer_move[1]] = 'T'  # Изменяем символ на T для отображения промаха
+                player_board.grid[computer_move[0]][computer_move[1]] = 'T'
 
             if all(ship.is_sunk() for ship in computer_ships):
                 print("Поздравляю! Вы выиграли!")
