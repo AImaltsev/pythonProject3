@@ -4,7 +4,7 @@ class Ship:
     def __init__(self, size):
         self.size = size
         self.hits = 0
-        self.coords = []
+        self.coords = set()  # Изменение здесь
 
     def hit(self):
         self.hits += 1
@@ -50,7 +50,7 @@ class Board:
         if orientation == 'horizontal':
             for i in range(ship.size):
                 self.grid[y][x + i] = '■'
-                ship.coords.append((y, x + i))
+                ship.coords.add((y, x + i))
                 if y > 0:
                     self.grid[y - 1][x + i] = 'О'
                 if y < self.size - 1:
@@ -62,7 +62,7 @@ class Board:
         elif orientation == 'vertical':
             for i in range(ship.size):
                 self.grid[y + i][x] = '■'
-                ship.coords.append((y + i, x))
+                ship.coords.add((y + i, x))
                 if x > 0:
                     self.grid[y + i][x - 1] = 'О'
                 if x < self.size - 1:
@@ -93,6 +93,7 @@ def main():
         computer_board.place_ship(ship)
 
     player_moves = set()
+    computer_moves = set()
 
     while True:
         print("Поле игрока!:")
@@ -116,23 +117,33 @@ def main():
                         ship.hit()  # Обновляем состояние корабля компьютера
                         if ship.is_sunk():
                             print("Вражеский корабль потоплен!")
-                        computer_board.grid[y][x] = 'X'
+                            for coord in ship.coords:  # Удаляем координаты потопленного корабля
+                                computer_board.grid[coord[0]][coord[1]] = 'X'
+                            computer_ships.remove(ship)  # Удаляем потопленный корабль из списка
+                        else:
+                            computer_board.grid[y][x] = 'X'  # Обозначаем попадание на корабль
             else:
                 print("Мимо!")
-                computer_board.grid[y][x] = 'T'
+                computer_board.grid[y][x] = 'T'  # Обозначаем промах
 
             for ship in player_ships:
                 print(f"Игрок: Корабль размером {ship.size}, попаданий: {ship.hits}, координаты: {ship.coords}")
 
-            computer_move = (random.randint(0, 5), random.randint(0, 5))
+            while True:
+                computer_move = (random.randint(0, 5), random.randint(0, 5))
+                if computer_move not in computer_moves:
+                    computer_moves.add(computer_move)
+                    break
+
             if player_board.grid[computer_move[0]][computer_move[1]] == '■':
                 print("Компьютер попал по вашему кораблю!")
                 for ship in player_ships:
-                    if (computer_move[0], computer_move[1]) in ship.coords:
+                    if computer_move in ship.coords:
                         ship.hit()
                         if ship.is_sunk():
                             print("Ваш корабль потоплен!")
                         player_board.grid[computer_move[0]][computer_move[1]] = 'X'
+                        ship.coords.remove(computer_move)
             else:
                 print("Компьютер промахнулся!")
                 player_board.grid[computer_move[0]][computer_move[1]] = 'T'
