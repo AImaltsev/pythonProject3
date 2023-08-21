@@ -4,7 +4,7 @@ class Ship:
     def __init__(self, size):
         self.size = size
         self.hits = 0
-        self.coords = set()  # Изменение здесь
+        self.coords = set()
 
     def hit(self):
         self.hits += 1
@@ -25,6 +25,18 @@ class Board:
             orientation = random.choice(['horizontal', 'vertical'])
 
             if self.can_place_ship(ship, x, y, orientation):
+                # Проверяем, что между кораблями на одну клетку есть отступ
+                if orientation == 'horizontal':
+                    if x > 0 and self.grid[y][x - 1] == '■':
+                        continue
+                    if x + ship.size < self.size and self.grid[y][x + ship.size] == '■':
+                        continue
+                elif orientation == 'vertical':
+                    if y > 0 and self.grid[y - 1][x] == '■':
+                        continue
+                    if y + ship.size < self.size and self.grid[y + ship.size][x] == '■':
+                        continue
+
                 self.add_ship(ship, x, y, orientation)
                 break
 
@@ -114,17 +126,17 @@ def main():
                 print("Вы подбили вражеский корабль!")
                 for ship in computer_ships:
                     if (y, x) in ship.coords:
-                        ship.hit()  # Обновляем состояние корабля компьютера
+                        ship.hit()
                         if ship.is_sunk():
                             print("Вражеский корабль потоплен!")
-                            for coord in ship.coords:  # Удаляем координаты потопленного корабля
+                            for coord in ship.coords:
                                 computer_board.grid[coord[0]][coord[1]] = 'X'
-                            computer_ships.remove(ship)  # Удаляем потопленный корабль из списка
+                            computer_ships.remove(ship)
                         else:
-                            computer_board.grid[y][x] = 'X'  # Обозначаем попадание на корабль
+                            computer_board.grid[y][x] = 'X'
             else:
                 print("Мимо!")
-                computer_board.grid[y][x] = 'T'  # Обозначаем промах
+                computer_board.grid[y][x] = 'T'
 
             for ship in player_ships:
                 print(f"Игрок: Корабль размером {ship.size}, попаданий: {ship.hits}, координаты: {ship.coords}")
@@ -169,13 +181,6 @@ def main():
 
         except Exception as e:
             print("Ошибка:", e)
-
-    if all(ship.is_sunk() for ship in computer_ships):
-        print("Поздравляю! Вы выиграли!")
-
-    if all(ship.is_sunk() for ship in player_ships):
-        print("Компьютер выиграл!")
-
 
 if __name__ == "__main__":
     main()
