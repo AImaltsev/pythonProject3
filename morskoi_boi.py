@@ -10,7 +10,7 @@ class Ship:
         self.hits += 1
 
     def is_sunk(self):
-        return self.hits >= self.size
+        return self.hits == self.size
 
 class Board:
     def __init__(self, size):
@@ -106,21 +106,23 @@ def main():
                 raise Exception("Вы уже стреляли по этой ячейке.")
 
             player_moves.add(player_move)
-            x = int(player_move[1]) - 1  # Изменено: преобразование буквенной координаты в числовую
-            y = ord(player_move[0]) - ord('A')  # Изменено: преобразование буквенной координаты в числовую
+            x = int(player_move[1]) - 1
+            y = ord(player_move[0]) - ord('A')
 
             if computer_board.grid[y][x] == '■':
                 print("Вы подбили вражеский корабль!")
                 for ship in computer_ships:
                     if (y, x) in ship.coords:
-                        ship.hit()
+                        ship.hit()  # Обновляем состояние корабля компьютера
                         if ship.is_sunk():
                             print("Вражеский корабль потоплен!")
                         computer_board.grid[y][x] = 'X'
-
             else:
                 print("Мимо!")
-                player_board.grid[y][x] = 'T'
+                computer_board.grid[y][x] = 'T'
+
+            for ship in player_ships:
+                print(f"Игрок: Корабль размером {ship.size}, попаданий: {ship.hits}, координаты: {ship.coords}")
 
             computer_move = (random.randint(0, 5), random.randint(0, 5))
             if player_board.grid[computer_move[0]][computer_move[1]] == '■':
@@ -135,6 +137,9 @@ def main():
                 print("Компьютер промахнулся!")
                 player_board.grid[computer_move[0]][computer_move[1]] = 'T'
 
+            for ship in computer_ships:
+                print(f"Компьютер: Корабль размером {ship.size}, попаданий: {ship.hits}, координаты: {ship.coords}")
+
             if all(ship.is_sunk() for ship in computer_ships):
                 print("Поздравляю! Вы выиграли!")
                 break
@@ -143,8 +148,23 @@ def main():
                 print("Компьютер выиграл!")
                 break
 
+            print("Состояние игры:")
+            print("Корабли противника:")
+            for ship in computer_ships:
+                print(f"Корабль размером {ship.size}, потоплен: {ship.is_sunk()}")
+            print("Ваши корабли:")
+            for ship in player_ships:
+                print(f"Корабль размером {ship.size}, потоплен: {ship.is_sunk()}")
+
         except Exception as e:
             print("Ошибка:", e)
+
+    if all(ship.is_sunk() for ship in computer_ships):
+        print("Поздравляю! Вы выиграли!")
+
+    if all(ship.is_sunk() for ship in player_ships):
+        print("Компьютер выиграл!")
+
 
 if __name__ == "__main__":
     main()
