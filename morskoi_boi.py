@@ -33,23 +33,15 @@ class Board:
             for i in range(ship.size):
                 if x + i >= self.size or self.grid[y][x + i] == '■':
                     return False
-                for j in range(max(0, x + i - 1), min(self.size, x + i + 2)):
-                    if y > 0 and self.grid[y - 1][j] == '■':
-                        return False
-                    if y < self.size - 1 and self.grid[y + 1][j] == '■':
-                        return False
-                    if self.grid[y][j] == '■':  # Проверка на отступы между кораблями по вертикали
+                for j in range(max(0, y - 1), min(self.size, y + 2)):
+                    if self.grid[j][x + i] == '■':
                         return False
         elif orientation == 'vertical':
             for i in range(ship.size):
                 if y + i >= self.size or self.grid[y + i][x] == '■':
                     return False
-                for j in range(max(0, y + i - 1), min(self.size, y + i + 2)):
-                    if x > 0 and self.grid[j][x - 1] == '■':
-                        return False
-                    if x < self.size - 1 and self.grid[j][x + 1] == '■':
-                        return False
-                    if self.grid[j][x] == '■':  # Проверка на отступы между кораблями по горизонтали
+                for j in range(max(0, x - 1), min(self.size, x + 2)):
+                    if self.grid[y + i][j] == '■':
                         return False
         return True
 
@@ -58,9 +50,11 @@ class Board:
         if orientation == 'horizontal':
             for i in range(ship.size):
                 self.grid[y][x + i] = '■'
+                ship.coords.append((y, x + i))
         elif orientation == 'vertical':
             for i in range(ship.size):
                 self.grid[y + i][x] = '■'
+                ship.coords.append((y + i, x))
 
     def display(self, hide_ships=False):
         header = '   ' + ' | '.join(str(i + 1) for i in range(self.size))
