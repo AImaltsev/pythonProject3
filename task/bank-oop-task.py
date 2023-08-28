@@ -66,5 +66,9 @@ transaction4.execute(object4)
 
 all_object = [object1, object2, object3, object4]
 
+
+print(21//4)
+
 for i in all_object:
     print(f"Счет {i.account_number}, баланс: {i.balance}, владелец {i.owner}")
+
