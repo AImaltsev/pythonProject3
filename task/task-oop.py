@@ -5,17 +5,21 @@
 class MenuItem:
     def __init__(self, name, description, price):
         self.name = name
-        self.description = ''
-        self.price = 0
+        self.description = description
+        self.price = price
 # Создайте класс Menu, представляющий меню ресторана.
 # Меню должно иметь методы для добавления новых элементов меню и вывода всего меню на экран.
 #
 class Menu:
-    def add_item_menu(self):
-        pass
+    def __init__(self):
+        self.menu_items = []  # Список для хранения элементов меню
+
+    def add_item_menu(self, item):
+        self.menu_items.append(item)
 
     def all_menu(self):
-        pass
+        for item in self.menu_items:
+            print(f"{item.name}: {item.description} - ${item.price}")  # Вывод всего меню на экран
 
 # Создайте класс Table, представляющий стол в ресторане. У стола должны быть следующие атрибуты:
 # Номер стола.
@@ -78,9 +82,25 @@ class Restaurant:
     def clear_table(self):
         pass
 
-    def 
+    def order_processing(self):
+        pass
+
+    def all_babosiki(self):
+        pass
+
+
 
 
 # Создайте интерфейс командной строки или графический интерфейс пользователя для взаимодействия с системой управления рестораном.
 #
 # Протестируйте систему, создав несколько заказов, обрабатывая их и проверяя работу системы управления рестораном.
+
+menu = Menu()
+
+item1 = MenuItem('Абсолют', 'водочка вкусненькая', '10,99')
+item2 = MenuItem('шашлык','шашлык из свиной шеи','15,47')
+
+menu.add_item_menu(item1)
+menu.add_item_menu(item2)
+
+menu.all_menu()
