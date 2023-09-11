@@ -1,20 +1,42 @@
-import telebot
-from tconf import a
-TOKEN = a
+import requests
+import json
+from tconf import api_currency
 
-bot = telebot.TeleBot(TOKEN)
+# Словарь для преобразования названий валют на русском в английский
+currency_names = {
+    'доллар': 'USD',
+    'рубль': 'RUB',
+    'евро': 'EUR',
+}
 
+# Функция для преобразования названия валюты из русского в английский
+def translate_currency_name(name):
+    return currency_names.get(name.lower(), name)
 
-# Обрабатываются все сообщения, содержащие команды '/start' or '/help'.
-@bot.message_handler(commands=['start', 'help'])
-def repeat(message: telebot.types.Message):
-    bot.reply_to(message, f"Привет, {message.chat.username}")
+class APIException(Exception):
+    def __init__(self, message):
+        self.message = message
 
+class CurrencyConverter:
+    BASE_URL = "https://api.currencyapi.com/v3/latest"
 
-@bot.message_handler(content_types=['photo'])
-def handle_photo(message: telebot.types.Message):
-    # Отправляем ответное сообщение с привязкой к картинке
-    bot.send_message(message.chat.id, "Nice meme XDD", reply_to_message_id=message.message_id)
+    @staticmethod
+    def get_price(base, quote, amount):
+        params = {
+            "apikey": api_currency,
+        }
 
+        response = requests.get(CurrencyConverter.BASE_URL, params=params)
+        data = response.json()
 
-bot.polling(none_stop=True)
+        if response.status_code != 200:
+            raise APIException("Не удалось получить данные из  API")
+
+        if base not in data["data"] or quote not in data["data"]:
+            raise APIException("Ошибка названия валюты")
+
+        base_rate = data["data"][base]["value"]
+        quote_rate = data["data"][quote]["value"]
+        exchange_rate = quote_rate / base_rate
+        converted_amount = amount * exchange_rate
+        return converted_amount
