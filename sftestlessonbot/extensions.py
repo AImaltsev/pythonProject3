@@ -1,6 +1,6 @@
 import telebot
-
-TOKEN = "6379299948:AAGcv7L5KIyOKwyGA2Cy1kksDoUT-cDcmqM"
+from tconf import a
+TOKEN = a
 
 bot = telebot.TeleBot(TOKEN)
 
